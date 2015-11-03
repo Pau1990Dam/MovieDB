@@ -36,6 +36,7 @@ public class MainActivityFragment extends Fragment {
     private ArrayAdapter<String> adapter;
     private String apikey="3abc6154c470ac598df9e7d97700f8cd";
     private final String BaseURL="https://api.themoviedb.org/3/movie/";
+    private int id;
 
     public MainActivityFragment() {
     }
@@ -87,18 +88,19 @@ public class MainActivityFragment extends Fragment {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         MovieDB servei = retrofit.create(MovieDB.class);
-        Call<TopMovies> call = servei.getPelicuesMillorCalificades(apikey);
-        call.enqueue(new Callback<TopMovies>() {
+        //Call<TopMovies> call = servei.getPelicuesMillorCalificades(apikey);
+        Call<Posters> call = servei.getPosters(apikey);
+        call.enqueue(new Callback<Posters>() { //call.enqueue(new Callback<TopMovies>() {
             @Override
-            public void onResponse(Response<TopMovies> response, Retrofit retrofit) {
+            public void onResponse(Response<Posters> response, Retrofit retrofit) {//public void onResponse(Response<TopMovies> response, Retrofit retrofit) {
                 if(response.isSuccess()){
                     Toast t= Toast.makeText(getContext(), "Success call", Toast.LENGTH_LONG);
                     t.show();
-                    TopMovies pelis=response.body();
+                    Posters pelis=response.body(); //TopMovies pelis=response.body();
                     adapter.clear();
 
-                    for(Pelicula peli: pelis.getResults()){
-                        adapter.add("Títol: "+peli.getTitle());
+                    for(Backdrop peli: pelis.getBackdrops()){ //for(Pelicula peli: pelis.getResults()){
+                        adapter.add("Id : "+peli.getFilePath());  // adapter.add("Id : "+peli.getId());
                     }
                 }else{
                     Toast t= Toast.makeText(getContext(), "Error", Toast.LENGTH_LONG);
@@ -116,5 +118,9 @@ public class MainActivityFragment extends Fragment {
     private interface MovieDB{
         @GET("top_rated")
         Call<TopMovies> getPelicuesMillorCalificades(@Query("api_key")String api_key);
-    }
+
+        @GET("129/images")
+        Call<Posters> getPosters(@Query("api_key")String api_key);
+    };
+
 }
